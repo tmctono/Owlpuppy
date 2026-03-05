@@ -66,7 +66,7 @@ struct HTTPResponse {
     
     var rawData: Data {
         let statusText = statusCode == 200 ? "OK" : "Not Found"
-        let responseString = "HTTP/1.1 \(statusCode) \(statusText)\r\nContent-Type: text/plain\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
+        let responseString = "HTTP/1.1 \(statusCode) \(statusText)\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/plain\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
         return responseString.data(using: .utf8) ?? Data()
     }
 }

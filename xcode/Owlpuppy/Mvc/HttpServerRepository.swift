@@ -61,6 +61,20 @@ class HttpServerRepository: ServerRepository {
             return
         }
         
+        if firstLine.hasPrefix("OPTIONS") {
+            let optionsResponse = """
+            HTTP/1.1 200 OK\r
+            Access-Control-Allow-Origin: *\r
+            Access-Control-Allow-Methods: POST, OPTIONS\r
+            Access-Control-Allow-Headers: Content-Type\r
+            Connection: close\r
+            \r\n
+            """
+            
+            sendResponse(optionsResponse, connection: connection)
+            return // OPTIONSの時はここで処理を終わらせる
+        }
+        
         let firstLineParts = firstLine.split(separator: " ")
         guard firstLineParts.count >= 2,
               let method = HTTPMethod(rawValue: String(firstLineParts[0])) else {
@@ -82,6 +96,16 @@ class HttpServerRepository: ServerRepository {
         }
         
         connection.send(content: response.rawData, completion: .contentProcessed({ _ in
+            connection.cancel()
+        }))
+    }
+    
+    private func sendResponse(_ responseString: String, connection: NWConnection) {
+        let data = responseString.data(using: .utf8)
+        connection.send(content: data, completion: .contentProcessed({ error in
+            if let error = error {
+                print("Error in sending response: \(error)")
+            }
             connection.cancel()
         }))
     }

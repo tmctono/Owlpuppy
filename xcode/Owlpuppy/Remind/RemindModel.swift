@@ -7,14 +7,11 @@
 
 import Foundation
 
+class RemindItem: Codable {
+    let isoDateTime: Date
+    let message: String
+}
+
 class RemindModel: ModelProtocol {
-    let title: String
-    let notes: String?
-    let targetDate: Date
-    
-    init(title: String, notes: String?, targetDate: Date) {
-        self.title = title
-        self.notes = notes
-        self.targetDate = targetDate
-    }
+    let items: [RemindItem]
 }

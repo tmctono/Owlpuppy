@@ -56,24 +56,26 @@ class RemindService: ServiceProtocol {
     }
     
     private func createAndSaveReminder(model: RemindModel) {
-        let reminder = EKReminder(eventStore: eventStore)
-        reminder.title = model.title
-        reminder.notes = model.notes
-        
-        guard let owlpuppyList = getOrCreateOwlpuppyList() else {
-            print("Error: could no find Owlpuppy list.")
-            return
-        }
-        reminder.calendar = owlpuppyList
-        
-        let alarm = EKAlarm(absoluteDate: model.targetDate)
-        reminder.addAlarm(alarm)
-        
-        do {
-            try eventStore.save(reminder, commit: true)
-            print("Owlpuppy: will remind [\(model.title)] at \(model.targetDate)")
-        } catch {
-            print("Owlpuppy: Error \(error.localizedDescription)")
+        model.items.forEach { item in
+            let reminder = EKReminder(eventStore: eventStore)
+            reminder.title = item.message
+            reminder.notes = "hoge"
+            
+            guard let owlpuppyList = getOrCreateOwlpuppyList() else {
+                print("Error: could no find Owlpuppy list.")
+                return
+            }
+            reminder.calendar = owlpuppyList
+            
+            let alarm = EKAlarm(absoluteDate: item.isoDateTime)
+            reminder.addAlarm(alarm)
+            
+            do {
+                try eventStore.save(reminder, commit: true)
+                print("Owlpuppy: will remind [\(item.message)] at \(item.isoDateTime)")
+            } catch {
+                print("Owlpuppy: Error \(error.localizedDescription)")
+            }
         }
     }
 }
